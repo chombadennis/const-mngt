@@ -1,0 +1,1330 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "pk": 1,
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 2,
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 3,
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 4,
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 5,
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 6,
+  "fields": {
+    "app_label": "core",
+    "model": "user"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 7,
+  "fields": {
+    "app_label": "core",
+    "model": "company"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 8,
+  "fields": {
+    "app_label": "core",
+    "model": "equipment"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 9,
+  "fields": {
+    "app_label": "core",
+    "model": "material"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 10,
+  "fields": {
+    "app_label": "core",
+    "model": "project"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 11,
+  "fields": {
+    "app_label": "core",
+    "model": "purchaseorder"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 12,
+  "fields": {
+    "app_label": "core",
+    "model": "role"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 13,
+  "fields": {
+    "app_label": "core",
+    "model": "task"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 14,
+  "fields": {
+    "app_label": "core",
+    "model": "worker"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 15,
+  "fields": {
+    "app_label": "core",
+    "model": "timesheet"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 16,
+  "fields": {
+    "app_label": "core",
+    "model": "purchaseorderline"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 17,
+  "fields": {
+    "app_label": "core",
+    "model": "maintenancerecord"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 18,
+  "fields": {
+    "app_label": "core",
+    "model": "invoice"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 19,
+  "fields": {
+    "app_label": "core",
+    "model": "inspection"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 20,
+  "fields": {
+    "app_label": "core",
+    "model": "document"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 21,
+  "fields": {
+    "app_label": "core",
+    "model": "activitylog"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "9duzwv158h7opypqqoofqqsw0apo15w6",
+  "fields": {
+    "session_data": ".eJxVjjsOwjAQBe_imlg2XjsxJT1niPbjJQGUSPlUiLuTSCmgfjOj9zYtrkvXrnOZ2l7MxTQJALjWyjeSKqCsFWKJ1VmTj0QBvVdz-tUI-VmG3ZUHDvfR8jgsU092R-yxzvY2SnldD_Yv0OHcbXZgDlFyzd4jlMCklCQzgCcMWRM5RafOFQnCGl0jMXhU0gxuO0vm8wU4GEJ9:1v0dth:soXVv3BIgtcQx4u0tvXyZ8JESdwtA2VhOFJQlEx3LSM",
+    "expire_date": "2025-10-06T10:35:53.134Z"
+  }
+},
+{
+  "model": "core.company",
+  "pk": "7023c08c-2014-48dd-8a62-bd6cc776063e",
+  "fields": {
+    "name": "My Company",
+    "address": "",
+    "phone": "",
+    "created_at": "2025-09-22T10:43:51.820Z"
+  }
+},
+{
+  "model": "core.company",
+  "pk": "7f0723e0-29ae-4a27-9d4d-7cefbdc60471",
+  "fields": {
+    "name": "Demo Company",
+    "address": "",
+    "phone": "",
+    "created_at": "2025-09-22T12:07:54.624Z"
+  }
+},
+{
+  "model": "core.project",
+  "pk": "780e8477-d719-411b-a419-0e421ede6d79",
+  "fields": {
+    "company": "7f0723e0-29ae-4a27-9d4d-7cefbdc60471",
+    "name": "Demo Project",
+    "code": "",
+    "description": "",
+    "start_date": null,
+    "end_date": null,
+    "status": "planning",
+    "created_at": "2025-09-22T12:07:56.771Z"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 1,
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 2,
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 3,
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 4,
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 5,
+  "fields": {
+    "name": "Can add permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 6,
+  "fields": {
+    "name": "Can change permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 7,
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 8,
+  "fields": {
+    "name": "Can view permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 9,
+  "fields": {
+    "name": "Can add group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 10,
+  "fields": {
+    "name": "Can change group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 11,
+  "fields": {
+    "name": "Can delete group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 12,
+  "fields": {
+    "name": "Can view group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 13,
+  "fields": {
+    "name": "Can add content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 14,
+  "fields": {
+    "name": "Can change content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 15,
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 16,
+  "fields": {
+    "name": "Can view content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 17,
+  "fields": {
+    "name": "Can add session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 18,
+  "fields": {
+    "name": "Can change session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 19,
+  "fields": {
+    "name": "Can delete session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 20,
+  "fields": {
+    "name": "Can view session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 21,
+  "fields": {
+    "name": "Can add user",
+    "content_type": [
+      "core",
+      "user"
+    ],
+    "codename": "add_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 22,
+  "fields": {
+    "name": "Can change user",
+    "content_type": [
+      "core",
+      "user"
+    ],
+    "codename": "change_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 23,
+  "fields": {
+    "name": "Can delete user",
+    "content_type": [
+      "core",
+      "user"
+    ],
+    "codename": "delete_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 24,
+  "fields": {
+    "name": "Can view user",
+    "content_type": [
+      "core",
+      "user"
+    ],
+    "codename": "view_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 25,
+  "fields": {
+    "name": "Can add company",
+    "content_type": [
+      "core",
+      "company"
+    ],
+    "codename": "add_company"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 26,
+  "fields": {
+    "name": "Can change company",
+    "content_type": [
+      "core",
+      "company"
+    ],
+    "codename": "change_company"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 27,
+  "fields": {
+    "name": "Can delete company",
+    "content_type": [
+      "core",
+      "company"
+    ],
+    "codename": "delete_company"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 28,
+  "fields": {
+    "name": "Can view company",
+    "content_type": [
+      "core",
+      "company"
+    ],
+    "codename": "view_company"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 29,
+  "fields": {
+    "name": "Can add equipment",
+    "content_type": [
+      "core",
+      "equipment"
+    ],
+    "codename": "add_equipment"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 30,
+  "fields": {
+    "name": "Can change equipment",
+    "content_type": [
+      "core",
+      "equipment"
+    ],
+    "codename": "change_equipment"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 31,
+  "fields": {
+    "name": "Can delete equipment",
+    "content_type": [
+      "core",
+      "equipment"
+    ],
+    "codename": "delete_equipment"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 32,
+  "fields": {
+    "name": "Can view equipment",
+    "content_type": [
+      "core",
+      "equipment"
+    ],
+    "codename": "view_equipment"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 33,
+  "fields": {
+    "name": "Can add material",
+    "content_type": [
+      "core",
+      "material"
+    ],
+    "codename": "add_material"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 34,
+  "fields": {
+    "name": "Can change material",
+    "content_type": [
+      "core",
+      "material"
+    ],
+    "codename": "change_material"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 35,
+  "fields": {
+    "name": "Can delete material",
+    "content_type": [
+      "core",
+      "material"
+    ],
+    "codename": "delete_material"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 36,
+  "fields": {
+    "name": "Can view material",
+    "content_type": [
+      "core",
+      "material"
+    ],
+    "codename": "view_material"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 37,
+  "fields": {
+    "name": "Can add project",
+    "content_type": [
+      "core",
+      "project"
+    ],
+    "codename": "add_project"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 38,
+  "fields": {
+    "name": "Can change project",
+    "content_type": [
+      "core",
+      "project"
+    ],
+    "codename": "change_project"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 39,
+  "fields": {
+    "name": "Can delete project",
+    "content_type": [
+      "core",
+      "project"
+    ],
+    "codename": "delete_project"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 40,
+  "fields": {
+    "name": "Can view project",
+    "content_type": [
+      "core",
+      "project"
+    ],
+    "codename": "view_project"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 41,
+  "fields": {
+    "name": "Can add purchase order",
+    "content_type": [
+      "core",
+      "purchaseorder"
+    ],
+    "codename": "add_purchaseorder"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 42,
+  "fields": {
+    "name": "Can change purchase order",
+    "content_type": [
+      "core",
+      "purchaseorder"
+    ],
+    "codename": "change_purchaseorder"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 43,
+  "fields": {
+    "name": "Can delete purchase order",
+    "content_type": [
+      "core",
+      "purchaseorder"
+    ],
+    "codename": "delete_purchaseorder"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 44,
+  "fields": {
+    "name": "Can view purchase order",
+    "content_type": [
+      "core",
+      "purchaseorder"
+    ],
+    "codename": "view_purchaseorder"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 45,
+  "fields": {
+    "name": "Can add role",
+    "content_type": [
+      "core",
+      "role"
+    ],
+    "codename": "add_role"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 46,
+  "fields": {
+    "name": "Can change role",
+    "content_type": [
+      "core",
+      "role"
+    ],
+    "codename": "change_role"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 47,
+  "fields": {
+    "name": "Can delete role",
+    "content_type": [
+      "core",
+      "role"
+    ],
+    "codename": "delete_role"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 48,
+  "fields": {
+    "name": "Can view role",
+    "content_type": [
+      "core",
+      "role"
+    ],
+    "codename": "view_role"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 49,
+  "fields": {
+    "name": "Can add task",
+    "content_type": [
+      "core",
+      "task"
+    ],
+    "codename": "add_task"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 50,
+  "fields": {
+    "name": "Can change task",
+    "content_type": [
+      "core",
+      "task"
+    ],
+    "codename": "change_task"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 51,
+  "fields": {
+    "name": "Can delete task",
+    "content_type": [
+      "core",
+      "task"
+    ],
+    "codename": "delete_task"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 52,
+  "fields": {
+    "name": "Can view task",
+    "content_type": [
+      "core",
+      "task"
+    ],
+    "codename": "view_task"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 53,
+  "fields": {
+    "name": "Can add worker",
+    "content_type": [
+      "core",
+      "worker"
+    ],
+    "codename": "add_worker"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 54,
+  "fields": {
+    "name": "Can change worker",
+    "content_type": [
+      "core",
+      "worker"
+    ],
+    "codename": "change_worker"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 55,
+  "fields": {
+    "name": "Can delete worker",
+    "content_type": [
+      "core",
+      "worker"
+    ],
+    "codename": "delete_worker"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 56,
+  "fields": {
+    "name": "Can view worker",
+    "content_type": [
+      "core",
+      "worker"
+    ],
+    "codename": "view_worker"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 57,
+  "fields": {
+    "name": "Can add timesheet",
+    "content_type": [
+      "core",
+      "timesheet"
+    ],
+    "codename": "add_timesheet"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 58,
+  "fields": {
+    "name": "Can change timesheet",
+    "content_type": [
+      "core",
+      "timesheet"
+    ],
+    "codename": "change_timesheet"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 59,
+  "fields": {
+    "name": "Can delete timesheet",
+    "content_type": [
+      "core",
+      "timesheet"
+    ],
+    "codename": "delete_timesheet"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 60,
+  "fields": {
+    "name": "Can view timesheet",
+    "content_type": [
+      "core",
+      "timesheet"
+    ],
+    "codename": "view_timesheet"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 61,
+  "fields": {
+    "name": "Can add purchase order line",
+    "content_type": [
+      "core",
+      "purchaseorderline"
+    ],
+    "codename": "add_purchaseorderline"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 62,
+  "fields": {
+    "name": "Can change purchase order line",
+    "content_type": [
+      "core",
+      "purchaseorderline"
+    ],
+    "codename": "change_purchaseorderline"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 63,
+  "fields": {
+    "name": "Can delete purchase order line",
+    "content_type": [
+      "core",
+      "purchaseorderline"
+    ],
+    "codename": "delete_purchaseorderline"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 64,
+  "fields": {
+    "name": "Can view purchase order line",
+    "content_type": [
+      "core",
+      "purchaseorderline"
+    ],
+    "codename": "view_purchaseorderline"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 65,
+  "fields": {
+    "name": "Can add maintenance record",
+    "content_type": [
+      "core",
+      "maintenancerecord"
+    ],
+    "codename": "add_maintenancerecord"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 66,
+  "fields": {
+    "name": "Can change maintenance record",
+    "content_type": [
+      "core",
+      "maintenancerecord"
+    ],
+    "codename": "change_maintenancerecord"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 67,
+  "fields": {
+    "name": "Can delete maintenance record",
+    "content_type": [
+      "core",
+      "maintenancerecord"
+    ],
+    "codename": "delete_maintenancerecord"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 68,
+  "fields": {
+    "name": "Can view maintenance record",
+    "content_type": [
+      "core",
+      "maintenancerecord"
+    ],
+    "codename": "view_maintenancerecord"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 69,
+  "fields": {
+    "name": "Can add invoice",
+    "content_type": [
+      "core",
+      "invoice"
+    ],
+    "codename": "add_invoice"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 70,
+  "fields": {
+    "name": "Can change invoice",
+    "content_type": [
+      "core",
+      "invoice"
+    ],
+    "codename": "change_invoice"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 71,
+  "fields": {
+    "name": "Can delete invoice",
+    "content_type": [
+      "core",
+      "invoice"
+    ],
+    "codename": "delete_invoice"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 72,
+  "fields": {
+    "name": "Can view invoice",
+    "content_type": [
+      "core",
+      "invoice"
+    ],
+    "codename": "view_invoice"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 73,
+  "fields": {
+    "name": "Can add inspection",
+    "content_type": [
+      "core",
+      "inspection"
+    ],
+    "codename": "add_inspection"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 74,
+  "fields": {
+    "name": "Can change inspection",
+    "content_type": [
+      "core",
+      "inspection"
+    ],
+    "codename": "change_inspection"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 75,
+  "fields": {
+    "name": "Can delete inspection",
+    "content_type": [
+      "core",
+      "inspection"
+    ],
+    "codename": "delete_inspection"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 76,
+  "fields": {
+    "name": "Can view inspection",
+    "content_type": [
+      "core",
+      "inspection"
+    ],
+    "codename": "view_inspection"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 77,
+  "fields": {
+    "name": "Can add document",
+    "content_type": [
+      "core",
+      "document"
+    ],
+    "codename": "add_document"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 78,
+  "fields": {
+    "name": "Can change document",
+    "content_type": [
+      "core",
+      "document"
+    ],
+    "codename": "change_document"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 79,
+  "fields": {
+    "name": "Can delete document",
+    "content_type": [
+      "core",
+      "document"
+    ],
+    "codename": "delete_document"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 80,
+  "fields": {
+    "name": "Can view document",
+    "content_type": [
+      "core",
+      "document"
+    ],
+    "codename": "view_document"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 81,
+  "fields": {
+    "name": "Can add activity log",
+    "content_type": [
+      "core",
+      "activitylog"
+    ],
+    "codename": "add_activitylog"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 82,
+  "fields": {
+    "name": "Can change activity log",
+    "content_type": [
+      "core",
+      "activitylog"
+    ],
+    "codename": "change_activitylog"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 83,
+  "fields": {
+    "name": "Can delete activity log",
+    "content_type": [
+      "core",
+      "activitylog"
+    ],
+    "codename": "delete_activitylog"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 84,
+  "fields": {
+    "name": "Can view activity log",
+    "content_type": [
+      "core",
+      "activitylog"
+    ],
+    "codename": "view_activitylog"
+  }
+},
+{
+  "model": "core.user",
+  "pk": "0cbec06c-292c-44c8-879c-b8bca1bee4ea",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$ehbh1GJvFT0Wp5uYeLQfEn$qlad1hoCjk0ET1kW+91IwbDSrSGsxoix7XDoU6kftYg=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "demo_manager",
+    "first_name": "Demo",
+    "last_name": "Manager",
+    "email": "manager@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-22T12:07:54.845Z",
+    "company": "7f0723e0-29ae-4a27-9d4d-7cefbdc60471",
+    "groups": [],
+    "user_permissions": [],
+    "roles": []
+  }
+},
+{
+  "model": "core.user",
+  "pk": "2456b0ef-e24f-42d1-a31f-a9dc1cfd0ad0",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$jGaKuKFMvVNMVcooBYZUjw$jEExL0ZKO2MMUeWhK3tqpwWNQ0t2iTB2nJd/kzrwa84=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "demo_worker",
+    "first_name": "Demo",
+    "last_name": "Worker",
+    "email": "worker@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-22T12:07:55.873Z",
+    "company": "7f0723e0-29ae-4a27-9d4d-7cefbdc60471",
+    "groups": [],
+    "user_permissions": [],
+    "roles": []
+  }
+},
+{
+  "model": "core.user",
+  "pk": "86444c7f-18d6-4b9f-aae5-2f615bb3a11f",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$OUbU18zT9gfu6GuE4ixkhG$gFRcEVWw7oRbZoiI3TUsmJ6DUVaSZBLtmbZTwIDGG+4=",
+    "last_login": "2025-09-22T10:35:53.002Z",
+    "is_superuser": true,
+    "username": "dennis",
+    "first_name": "",
+    "last_name": "",
+    "email": "dennis_chomba@outlook.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-20T22:38:10.649Z",
+    "company": null,
+    "groups": [],
+    "user_permissions": [],
+    "roles": []
+  }
+},
+{
+  "model": "core.user",
+  "pk": "ce022bb3-41c1-41fc-9d27-08015ee41bdd",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$2kj2moR6C4pZP35lNWQwp8$Wfs1+IEBXrOnZad3GxpdOboParb8RA6gVN4NUVYYGwk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "demo",
+    "first_name": "Demo",
+    "last_name": "User",
+    "email": "demo@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-22T10:12:38.988Z",
+    "company": null,
+    "groups": [],
+    "user_permissions": [],
+    "roles": []
+  }
+},
+{
+  "model": "core.document",
+  "pk": "2873b493-1351-4c52-9018-28264dd1b1be",
+  "fields": {
+    "company": "7023c08c-2014-48dd-8a62-bd6cc776063e",
+    "uploaded_by": [
+      "demo"
+    ],
+    "file": "documents/cv.pdf",
+    "filename": "cv.pdf",
+    "content_type": "",
+    "size": 239718,
+    "created_at": "2025-09-22T10:48:22.992Z"
+  }
+},
+{
+  "model": "core.document",
+  "pk": "e30ce154-54f3-44ed-ab8e-33c8e31bcfd4",
+  "fields": {
+    "company": "7f0723e0-29ae-4a27-9d4d-7cefbdc60471",
+    "uploaded_by": [
+      "demo_manager"
+    ],
+    "file": "documents/demo-file_7LO99rE.txt",
+    "filename": "documents/demo-file_7LO99rE.txt",
+    "content_type": "",
+    "size": 60,
+    "created_at": "2025-09-22T12:13:23.110Z"
+  }
+}
+]
