@@ -23,22 +23,150 @@ api.interceptors.request.use((config) => {
 });
 
 // -----------------------------
+// --- Automatic refresh flow ---
+// -----------------------------
+// This response interceptor will try to refresh the access token once when a 401 occurs,
+// queue concurrent requests while refresh is in progress, then retry original requests.
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string) => void> = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(newToken: string) {
+  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers = [];
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error: any) => {
+    const originalRequest = error?.config;
+
+    // If no response or no status, forward error
+    if (!error || !error.response) {
+      return Promise.reject(error);
+    }
+
+    const status = error.response.status;
+
+    // Don't try to refresh for token endpoints or if _retry flag set
+    const isTokenEndpoint =
+      originalRequest?.url?.includes("/auth/token/") || originalRequest?.url?.includes("/auth/token/refresh/");
+
+    // --- inside your api.ts interceptor --- //
+if (status === 401 && originalRequest && !originalRequest._retry && !isTokenEndpoint) {
+  (originalRequest as any)._retry = true;
+
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) {
+    // No refresh -> force logout / redirect
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    if (typeof window !== "undefined") {
+      window.location.href = "/auth/login";
+    }
+    return Promise.reject(error);
+  }
+
+  if (isRefreshing) {
+    // queue this request until refresh finishes
+    return new Promise((resolve, reject) => {
+      subscribeTokenRefresh((token: string) => {
+        if (!originalRequest.headers) originalRequest.headers = {};
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        resolve(api(originalRequest));
+      });
+    });
+  }
+
+  isRefreshing = true;
+
+  try {
+    // Explicitly type refresh response
+    interface RefreshResponse {
+      access: string;
+      refresh?: string;
+    }
+
+    // Use axios directly (bypassing interceptors)
+    const resp = await axios.post<RefreshResponse>(`${API_BASE_URL}/auth/token/refresh/`, {
+      refresh: refreshToken,
+    });
+
+    const newAccess = resp.data.access; // TS now knows "access" exists
+
+    // Persist new access token
+    localStorage.setItem("accessToken", newAccess);
+
+    // Notify queued requests
+    onRefreshed(newAccess);
+
+    // Retry original request with new token
+    if (!originalRequest.headers) originalRequest.headers = {};
+    originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+    return api(originalRequest);
+  } catch (refreshError) {
+    // Refresh failed -> clear storage and force redirect to login
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    if (typeof window !== "undefined") {
+      window.location.href = "/auth/login";
+    }
+    return Promise.reject(refreshError);
+  } finally {
+    isRefreshing = false;
+  }
+}
+
+    return Promise.reject(error);
+  }
+);
+
+// -----------------------------
 // --- Auth: Login / Register ---
 // -----------------------------
 
 export interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface LoginResponse {
-  token: string;
+  token: string; // access token (kept for compatibility)
+  refresh?: string; // refresh token (optional on return)
 }
 
-export const loginUser = async (data: LoginData): Promise<LoginResponse> => {
-  const res = await api.post("/auth/login/", data);
-  return res.data as LoginResponse;
+// --- Auth: Login --- //
+export const loginUser = async (
+  data: LoginData
+): Promise<LoginResponse> => {
+  interface SimpleJWTResponse {
+    access: string;
+    refresh: string;
+  }
+
+  const res = await api.post<SimpleJWTResponse>("/auth/token/", {
+    username: data.username,
+    password: data.password,
+  });
+
+  // Persist refresh token (so AuthContext or interceptors can use it)
+  if (res.data?.refresh) {
+    try {
+      localStorage.setItem("refreshToken", res.data.refresh);
+    } catch (err) {
+      // best-effort; don't block login if storage fails
+      console.warn("Failed to save refresh token to localStorage", err);
+    }
+  }
+
+  return { token: res.data.access, refresh: res.data.refresh };
 };
+
 
 export interface RegisterData {
   email: string;
@@ -309,8 +437,6 @@ export const deleteInspection = async (id: string): Promise<{ message: string }>
   const res = await api.delete(`/inspections/${id}/`);
   return res.data as { message: string };
 };
-
-
 
 // lib/api.ts (Equipment CRUD additions)
 

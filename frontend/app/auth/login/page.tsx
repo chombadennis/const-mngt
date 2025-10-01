@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser, LoginData, LoginResponse, api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { User } from "@/types/User";
+import { User as BaseUser } from "@/types/User";
+
+type User = BaseUser & { is_superuser: boolean };
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [form, setForm] = useState<LoginData>({ email: "", password: "" });
+  const [form, setForm] = useState<LoginData>({ username: "", password: "" });
 
   const mutation = useMutation<LoginResponse, Error, LoginData>({
     mutationFn: loginUser,
@@ -20,6 +22,7 @@ export default function LoginPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // AuthContext.login will handle saving and redirecting to /dashboard
       login(token, userResp.data);
     },
   });
@@ -34,38 +37,40 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 bg-white shadow rounded">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      {mutation.isError && (
-        <p className="text-red-500 mb-2">{mutation.error.message}</p>
-      )}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-        <button
-          type="submit"
-          disabled={mutation.isPending}
-          className="bg-blue-500 text-white p-2 rounded disabled:opacity-50"
-        >
-          {mutation.isPending ? "Logging in..." : "Login"}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-900 via-gray-900 to-black">
+      <div className="w-full max-w-md p-8 bg-gray-800 rounded-2xl shadow-xl">
+        <h1 className="text-3xl font-bold mb-6 text-center text-white">Login</h1>
+        {mutation.isError && (
+          <p className="text-red-400 mb-4 text-center">{mutation.error.message}</p>
+        )}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            type="text"
+            name="username"
+            placeholder="username"
+            value={form.username}
+            onChange={handleChange}
+            className="border border-gray-600 p-3 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            className="border border-gray-600 p-3 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded transition disabled:opacity-50"
+          >
+            {mutation.isPending ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

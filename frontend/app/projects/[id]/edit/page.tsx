@@ -1,90 +1,223 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import {
+  Project,
+  Task,
+  fetchProjectById,
+  updateProject,
+  createTask,
+  updateTask,
+  deleteTask,
+} from "@/lib/api";
+import { DashboardCard } from "@/app/components/DashboardCard";
+import PMOnly from "@/components/auth/PMOnly";
+import AdminOnly from "@/components/auth/AdminOnly";
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  start_date: string;
-  end_date: string;
-}
+// Extend Project type locally so tasks are recognized
+type ProjectWithTasks = Project & { tasks?: Task[] };
 
-const fetchProject = async (id: string): Promise<Project> => {
-  const res = await api.get(`/projects/${id}/`);
-  return res.data as Project;
-};
-
-const updateProject = async (project: Project): Promise<Project> => {
-  const res = await api.put(`/projects/${project.id}/`, project);
-  return res.data as Project;
-};
-
-export default function ProjectEditPage() {
+export default function EditProjectPage() {
   const params = useParams();
   const projectId = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Hooks are always called
-  const { data, isLoading } = useQuery<Project>({
-    queryKey: ["project", projectId] as const,
-    queryFn: () => fetchProject(projectId!),
+  const { data, isLoading, isError } = useQuery<ProjectWithTasks>({
+    queryKey: ["project", projectId],
+    queryFn: () => fetchProjectById(projectId!),
     enabled: !!projectId,
   });
 
-  const mutation = useMutation<Project, Error, Project>({
-    mutationFn: updateProject,
-    onSuccess: () => {
-  if (projectId) queryClient.invalidateQueries({ queryKey: ["project", projectId] });
-  router.push("/projects");
-}
-    },
-  );
+  const [form, setForm] = useState<Omit<Project, "id" | "company" | "created_at"> | null>(null);
+  const [newTaskName, setNewTaskName] = useState("");
 
-  const [form, setForm] = useState<Project>({
-    id: projectId || "",
-    name: "",
-    description: "",
-    start_date: "",
-    end_date: "",
+  useEffect(() => {
+    if (data && !form) {
+      setForm({
+        name: data.name,
+        code: data.code,
+        description: data.description || "",
+        start_date: data.start_date || "",
+        end_date: data.end_date || "",
+        status: data.status,
+      });
+    }
+  }, [data, form]);
+
+  const projectMutation = useMutation({
+    mutationFn: (updated: Omit<Project, "id" | "company" | "created_at">) =>
+      updateProject(projectId!, updated),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      alert("Project updated successfully");
+    },
   });
 
-  // Functional update avoids exhaustive-deps warning
-  useEffect(() => {
-    if (data) setForm(f => ({ ...f, ...data }));
-  }, [data]);
+  const createTaskMutation = useMutation({
+    mutationFn: (task: Omit<Task, "id">) => createTask(task),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      setNewTaskName("");
+    },
+  });
+
+  const updateTaskMutation = useMutation({
+    mutationFn: (task: Task) => updateTask(task.id!, task),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: (id: string) => deleteTask(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
+  });
 
   if (!projectId) return <p>Project ID missing</p>;
-  if (isLoading) return <p>Loading project...</p>;
+  if (isLoading || !form) return <p>Loading project...</p>;
+  if (isError || !data) return <p>Error loading project details.</p>;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm(f => (f ? { ...f, [name]: value } : f));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate(form);
+  const handleSaveProject = () => {
+    if (form) projectMutation.mutate(form);
+  };
+
+  const handleAddTask = () => {
+    if (!newTaskName.trim()) return;
+    createTaskMutation.mutate({ project_id: projectId!, name: newTaskName, status: "todo" });
+  };
+
+  const handleDeleteTask = (id: string) => {
+    if (confirm("Delete this task?")) deleteTaskMutation.mutate(id);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-4">
-      <label className="block mb-2">Project Name</label>
-      <input name="name" value={form.name} onChange={handleChange} className="input-field" />
+    <PMOnly>
+      <AdminOnly>
+        <div className="max-w-4xl mx-auto mt-6 space-y-8">
+          <h1 className="text-2xl font-bold text-gray-900">Edit Project</h1>
 
-      <label className="block mb-2 mt-4">Description</label>
-      <textarea name="description" value={form.description} onChange={handleChange} className="input-field" />
+          {/* Project Form */}
+          <div className="flex flex-col gap-4 bg-white p-6 shadow-lg rounded-lg">
+            <input
+              name="name"
+              placeholder="Project Name"
+              value={form.name}
+              onChange={handleChange}
+              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              name="code"
+              placeholder="Project Code"
+              value={form.code}
+              onChange={handleChange}
+              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={handleChange}
+              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="date"
+              name="start_date"
+              value={form.start_date}
+              onChange={handleChange}
+              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="date"
+              name="end_date"
+              value={form.end_date}
+              onChange={handleChange}
+              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <select
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="planning">Planning</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+            </select>
+            <button
+              onClick={handleSaveProject}
+              disabled={projectMutation.isPending}
+              className="bg-blue-500 text-white p-3 rounded shadow hover:bg-blue-600 transition disabled:opacity-50"
+            >
+              {projectMutation.isPending ? "Saving..." : "Save Project"}
+            </button>
+          </div>
 
-      <label className="block mb-2 mt-4">Start Date</label>
-      <input type="date" name="start_date" value={form.start_date} onChange={handleChange} className="input-field" />
-
-      <label className="block mb-2 mt-4">End Date</label>
-      <input type="date" name="end_date" value={form.end_date} onChange={handleChange} className="input-field" />
-
-      <button type="submit" className="btn mt-4">Save Project</button>
-    </form>
+          {/* Tasks Management */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Tasks</h2>
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="New Task Name"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                className="border p-2 rounded flex-1 shadow-sm focus:ring-2 focus:ring-green-400"
+              />
+              <button
+                onClick={handleAddTask}
+                className="bg-green-500 text-white p-2 rounded shadow hover:bg-green-600 transition"
+                disabled={createTaskMutation.isPending}
+              >
+                Add
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {data.tasks && data.tasks.length > 0 ? (
+                data.tasks.map((task: Task) => (
+                  <DashboardCard
+                    key={task.id}
+                    title={task.name}
+                    value={task.status}
+                    actions={
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          className="bg-yellow-500 text-white p-1 rounded text-sm hover:bg-yellow-600 transition"
+                          onClick={() => {
+                            const newStatus = prompt("Update status", task.status);
+                            if (newStatus)
+                              updateTaskMutation.mutate({ ...task, status: newStatus });
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="bg-red-500 text-white p-1 rounded text-sm hover:bg-red-600 transition"
+                          onClick={() => handleDeleteTask(task.id!)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    }
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 col-span-full text-center">
+                  No tasks added yet. Use the input above to add tasks.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </AdminOnly>
+    </PMOnly>
   );
 }

@@ -123,6 +123,9 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),   # accept Bearer
+    "USER_ID_FIELD": "id",              # UUID support
+    "USER_ID_CLAIM": "user_id",
 }
 
 # CORS
@@ -204,3 +207,9 @@ if SENTRY_DSN:
     from sentry_sdk.integrations.django import DjangoIntegration
 
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], traces_sample_rate=0.0)
+
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "authorization",
+]

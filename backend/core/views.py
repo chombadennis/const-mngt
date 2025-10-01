@@ -43,6 +43,7 @@ from .serializers import (
     RegisterSerializer,
 )
 from .permissions import IsAdminOrReadOnly, RoleBasedPermission
+from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
@@ -55,6 +56,17 @@ class RegisterView(generics.CreateAPIView):
     """
     permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
+
+
+class MeView(APIView):
+    """
+    Return the authenticated user's profile.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
 
 
 # -------------------------
@@ -313,3 +325,6 @@ class CloudinaryUploadView(APIView):
             return Response({"url": result.get("secure_url"), "public_id": result.get("public_id"), "raw": result}, status=status.HTTP_201_CREATED)
         except Exception as exc:
             return Response({"detail": "Upload failed", "error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+

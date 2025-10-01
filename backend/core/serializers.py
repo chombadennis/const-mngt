@@ -63,8 +63,19 @@ class UserSerializer(serializers.ModelSerializer):
             "roles",
             "role_ids",
             "is_active",
+            "is_superuser",
         ]
         read_only_fields = ["id", "company", "roles"]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.is_superuser:
+            # Ensure "Admin" is included in roles output
+            roles = data.get("roles", [])
+            if not any(role.get("name") == "Admin" for role in roles):
+                roles.append({"id": None, "name": "Admin", "description": "Superuser role"})
+                data["roles"] = roles
+        return data
 
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from .views import MeView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
@@ -48,6 +49,7 @@ urlpatterns = [
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # Registration
     path("auth/register/", RegisterView.as_view(), name="auth_register"),
+    path("auth/me/", MeView.as_view(), name="auth_me"),
     # optional server-side Cloudinary upload
     path("uploads/cloudinary/", CloudinaryUploadView.as_view(), name="cloudinary_upload"),
 ]

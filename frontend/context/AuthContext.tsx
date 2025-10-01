@@ -8,11 +8,13 @@ interface User {
   username: string;
   email: string;
   roles: string[];
+  is_superuser: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   login: (token: string, user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -24,22 +26,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     // Load from localStorage
     const savedToken = localStorage.getItem("accessToken");
     const savedUser = localStorage.getItem("user");
+    const savedRefresh = localStorage.getItem("refreshToken");
 
     if (savedToken && savedUser) {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
+    }
+    if (savedRefresh) {
+      setRefreshToken(savedRefresh);
     }
   }, []);
 
   const login = (jwt: string, userData: User) => {
     setToken(jwt);
     setUser(userData);
+    // refreshToken may have been saved by loginUser (api.ts). Read it from localStorage.
+    const savedRefresh = localStorage.getItem("refreshToken");
+    setRefreshToken(savedRefresh);
     localStorage.setItem("accessToken", jwt);
     localStorage.setItem("user", JSON.stringify(userData));
     router.push("/dashboard");
@@ -48,13 +58,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setToken(null);
     setUser(null);
+    setRefreshToken(null);
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   const hasRole = (role: string) => {
-    return user?.roles.includes(role) ?? false;
+    return (user?.is_superuser || user?.roles.includes(role)) ?? false;
   };
 
   return (
@@ -62,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         token,
+        refreshToken,
         login,
         logout,
         isAuthenticated: !!user && !!token,
