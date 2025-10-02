@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { refreshAccessToken } from "@/lib/api";
 
 interface User {
   id: number;
@@ -23,6 +24,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function decodeJwt(token: string): { exp: number } | null {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -30,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Load from localStorage
     const savedToken = localStorage.getItem("accessToken");
     const savedUser = localStorage.getItem("user");
     const savedRefresh = localStorage.getItem("refreshToken");
@@ -44,10 +60,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // 🔹 Proactive refresh: decode token expiry and refresh before it expires
+  useEffect(() => {
+    if (!token || !refreshToken) return;
+
+    const decoded = decodeJwt(token);
+    if (!decoded?.exp) return;
+
+    const expiryTime = decoded.exp * 1000;
+    const now = Date.now();
+    const refreshTime = expiryTime - now - 30 * 1000; // refresh 30s before expiry
+
+    if (refreshTime <= 0) {
+      (async () => {
+        const newAccess = await refreshAccessToken();
+        if (newAccess) {
+          setToken(newAccess);
+        } else {
+          logout();
+        }
+      })();
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      const newAccess = await refreshAccessToken();
+      if (newAccess) {
+        setToken(newAccess);
+      } else {
+        logout();
+      }
+    }, refreshTime);
+
+    return () => clearTimeout(timeout);
+  }, [token, refreshToken]);
+
   const login = (jwt: string, userData: User) => {
     setToken(jwt);
     setUser(userData);
-    // refreshToken may have been saved by loginUser (api.ts). Read it from localStorage.
     const savedRefresh = localStorage.getItem("refreshToken");
     setRefreshToken(savedRefresh);
     localStorage.setItem("accessToken", jwt);

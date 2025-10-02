@@ -15,6 +15,7 @@ import {
 import { DashboardCard } from "@/app/components/DashboardCard";
 import PMOnly from "@/components/auth/PMOnly";
 import AdminOnly from "@/components/auth/AdminOnly";
+import { useRouter } from "next/navigation";
 
 // Extend Project type locally so tasks are recognized
 type ProjectWithTasks = Project & { tasks?: Task[] };
@@ -23,6 +24,7 @@ export default function EditProjectPage() {
   const params = useParams();
   const projectId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { data, isLoading, isError } = useQuery<ProjectWithTasks>({
     queryKey: ["project", projectId],
@@ -41,7 +43,7 @@ export default function EditProjectPage() {
         description: data.description || "",
         start_date: data.start_date || "",
         end_date: data.end_date || "",
-        status: data.status,
+        status: (data.status as "planning" | "active" | "paused" | "completed") || "planning",
       });
     }
   }, [data, form]);
@@ -74,6 +76,28 @@ export default function EditProjectPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
   });
 
+  // Project-level quick actions
+  const quickStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: "planning" | "active" | "paused" | "completed" }) =>
+      updateProject(id, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete project");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      router.push("/projects");
+    },
+  });
+
   if (!projectId) return <p>Project ID missing</p>;
   if (isLoading || !form) return <p>Loading project...</p>;
   if (isError || !data) return <p>Error loading project details.</p>;
@@ -82,7 +106,17 @@ export default function EditProjectPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm(f => (f ? { ...f, [name]: value } : f));
+    setForm(f =>
+      f
+        ? {
+            ...f,
+            [name]:
+              name === "status"
+                ? (value as "planning" | "active" | "paused" | "completed")
+                : value,
+          }
+        : f
+    );
   };
 
   const handleSaveProject = () => {
@@ -98,67 +132,145 @@ export default function EditProjectPage() {
     if (confirm("Delete this task?")) deleteTaskMutation.mutate(id);
   };
 
+  const handleArchiveProject = () => {
+    if (!confirm("Archive this project?")) return;
+    quickStatusMutation.mutate({ id: projectId!, status: "paused" });
+  };
+
+  const handleDeleteProject = () => {
+    if (!confirm("Delete this project permanently? This cannot be undone.")) return;
+    deleteProjectMutation.mutate(projectId!);
+  };
+
   return (
     <PMOnly>
       <AdminOnly>
         <div className="max-w-4xl mx-auto mt-6 space-y-8">
-          <h1 className="text-2xl font-bold text-gray-900">Edit Project</h1>
+          {/* Header bar */}
+          <div
+            style={{ background: "linear-gradient(90deg,#071433,#0d3358)" }}
+            className="p-4 rounded-2xl text-white"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold">Edit Project</h1>
+                <p className="text-sm text-white/90 mt-1">Update project details and manage tasks</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/projects")}
+                  className="bg-white/10 text-white px-3 py-1 rounded-lg text-sm hover:bg-white/20 transition"
+                >
+                  Back to Projects
+                </button>
+
+                <button
+                  onClick={handleArchiveProject}
+                  className="bg-yellow-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-yellow-600 transition"
+                >
+                  Archive
+                </button>
+
+                <button
+                  onClick={handleDeleteProject}
+                  className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-700 transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* Project Form */}
-          <div className="flex flex-col gap-4 bg-white p-6 shadow-lg rounded-lg">
-            <input
-              name="name"
-              placeholder="Project Name"
-              value={form.name}
-              onChange={handleChange}
-              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              name="code"
-              placeholder="Project Code"
-              value={form.code}
-              onChange={handleChange}
-              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-            />
-            <textarea
-              name="description"
-              placeholder="Description"
-              value={form.description}
-              onChange={handleChange}
-              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="date"
-              name="start_date"
-              value={form.start_date}
-              onChange={handleChange}
-              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="date"
-              name="end_date"
-              value={form.end_date}
-              onChange={handleChange}
-              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-            />
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="border p-3 rounded shadow-sm focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="planning">Planning</option>
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="completed">Completed</option>
-            </select>
-            <button
-              onClick={handleSaveProject}
-              disabled={projectMutation.isPending}
-              className="bg-blue-500 text-white p-3 rounded shadow hover:bg-blue-600 transition disabled:opacity-50"
-            >
-              {projectMutation.isPending ? "Saving..." : "Save Project"}
-            </button>
+          <div className="flex flex-col gap-4 bg-white p-6 shadow-lg rounded-2xl">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Project Name</label>
+              <input
+                name="name"
+                placeholder="Project Name"
+                value={form.name}
+                onChange={handleChange}
+                className="border p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder:text-slate-400 bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Project Code</label>
+              <input
+                name="code"
+                placeholder="Project Code"
+                value={form.code}
+                onChange={handleChange}
+                className="border p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder:text-slate-400 bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+              <textarea
+                name="description"
+                placeholder="Description"
+                value={form.description}
+                onChange={handleChange}
+                className="border p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder:text-slate-400 bg-white"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
+                <input
+                  type="date"
+                  name="start_date"
+                  value={form.start_date}
+                  onChange={handleChange}
+                  className="border p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder:text-slate-400 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">End Date</label>
+                <input
+                  type="date"
+                  name="end_date"
+                  value={form.end_date}
+                  onChange={handleChange}
+                  className="border p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder:text-slate-400 bg-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                className="border p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-slate-900 bg-white"
+              >
+                <option value="planning">Planning</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleSaveProject}
+                disabled={projectMutation.isPending}
+                className="bg-blue-500 text-white p-3 rounded-2xl hover:bg-blue-600 transition disabled:opacity-50"
+              >
+                {projectMutation.isPending ? "Saving..." : "Save Project"}
+              </button>
+
+              <button
+                onClick={() => router.push("/projects")}
+                className="border border-slate-200 text-slate-700 p-3 rounded-2xl hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
 
           {/* Tasks Management */}
@@ -170,11 +282,11 @@ export default function EditProjectPage() {
                 placeholder="New Task Name"
                 value={newTaskName}
                 onChange={(e) => setNewTaskName(e.target.value)}
-                className="border p-2 rounded flex-1 shadow-sm focus:ring-2 focus:ring-green-400"
+                className="border p-2 rounded-lg flex-1 shadow-sm focus:ring-2 focus:ring-green-400 text-slate-900 placeholder:text-slate-400 bg-white"
               />
               <button
                 onClick={handleAddTask}
-                className="bg-green-500 text-white p-2 rounded shadow hover:bg-green-600 transition"
+                className="bg-green-500 text-white p-2 rounded-2xl shadow hover:bg-green-600 transition"
                 disabled={createTaskMutation.isPending}
               >
                 Add
@@ -194,7 +306,10 @@ export default function EditProjectPage() {
                           onClick={() => {
                             const newStatus = prompt("Update status", task.status);
                             if (newStatus)
-                              updateTaskMutation.mutate({ ...task, status: newStatus });
+                              updateTaskMutation.mutate({
+                                ...task,
+                                status: newStatus as "todo" | "in-progress" | "done",
+                              });
                           }}
                         >
                           Edit
@@ -210,9 +325,10 @@ export default function EditProjectPage() {
                   />
                 ))
               ) : (
-                <p className="text-gray-500 col-span-full text-center">
-                  No tasks added yet. Use the input above to add tasks.
-                </p>
+                <div className="col-span-full text-center p-6 bg-white rounded-2xl shadow-sm">
+                  <p className="text-gray-600">No tasks added yet.</p>
+                  <p className="text-sm text-gray-400">Use the input above to create tasks and organize work.</p>
+                </div>
               )}
             </div>
           </div>

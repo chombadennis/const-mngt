@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { createMaterial, Material } from "@/lib/api";
+import PMOnly from "@/components/auth/PMOnly";
+import Link from "next/link";
 
 export default function CreateMaterialPage() {
   const router = useRouter();
@@ -40,59 +42,83 @@ export default function CreateMaterialPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 bg-white shadow rounded">
-      <h1 className="text-2xl font-bold mb-4">Create Material</h1>
-
-      {mutation.isError && (
-        <p className="text-red-500 mb-2">
-          {mutation.error?.message ?? "An error occurred"}
-        </p>
-      )}
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          name="sku"
-          placeholder="SKU"
-          value={form.sku}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-        <input
-          type="text"
-          name="name"
-          placeholder="Material Name"
-          value={form.name}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          className="border p-2 rounded"
-        />
-        <input
-          type="text"
-          name="unit"
-          placeholder="Unit (e.g., bag, kg, piece)"
-          value={form.unit}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-        <button
-          type="submit"
-          disabled={mutation.isPending}
-          className="bg-green-500 text-white p-2 rounded disabled:opacity-50"
-        >
-          {mutation.isPending ? "Creating..." : "Create"}
-        </button>
-      </form>
-    </div>
+    <PMOnly fallback={<p className="text-center mt-12 text-white">You don’t have permission to create materials.</p>}>
+      <div className="min-h-screen bg-gradient-to-b from-[#071433] to-[#0d3358] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-[#071433] to-[#0d3358] p-4">
+            <h1 className="text-2xl font-bold text-white">Create Material</h1>
+          </div>
+          <div className="p-6">
+            {mutation.isError && (
+              <p className="text-red-500 mb-2">
+                {mutation.error?.message ?? "An error occurred"}
+              </p>
+            )}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">SKU</label>
+                <input
+                  type="text"
+                  name="sku"
+                  placeholder="SKU"
+                  value={form.sku}
+                  onChange={handleChange}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Material Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Material Name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  placeholder="Description"
+                  value={form.description}
+                  onChange={handleChange}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Unit</label>
+                <input
+                  type="text"
+                  name="unit"
+                  placeholder="Unit (e.g., bag, kg, piece)"
+                  value={form.unit}
+                  onChange={handleChange}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg disabled:opacity-50"
+              >
+                {mutation.isPending ? "Creating..." : "Create"}
+              </button>
+              <Link
+                href="/materials"
+                className="text-blue-600 hover:underline text-sm text-center"
+              >
+                Back to Materials
+              </Link>
+            </form>
+          </div>
+        </div>
+      </div>
+    </PMOnly>
   );
 }

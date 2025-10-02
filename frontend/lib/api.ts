@@ -1,4 +1,3 @@
-// frontend/lib/api.ts
 import axios from "axios";
 
 // --- Axios Instance --- //
@@ -25,8 +24,6 @@ api.interceptors.request.use((config) => {
 // -----------------------------
 // --- Automatic refresh flow ---
 // -----------------------------
-// This response interceptor will try to refresh the access token once when a 401 occurs,
-// queue concurrent requests while refresh is in progress, then retry original requests.
 let isRefreshing = false;
 let refreshSubscribers: Array<(token: string) => void> = [];
 
@@ -39,88 +36,90 @@ function onRefreshed(newToken: string) {
   refreshSubscribers = [];
 }
 
+// 🔹 Exported helper so AuthContext can use it for proactive refresh
+export async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!refreshToken) return null;
+
+  try {
+    const resp = await axios.post<{ access: string; refresh?: string }>(
+      `${API_BASE_URL}/auth/token/refresh/`,
+      { refresh: refreshToken }
+    );
+
+    const newAccess = resp.data.access;
+    const newRefresh = resp.data.refresh;
+
+    localStorage.setItem("accessToken", newAccess);
+    if (newRefresh) localStorage.setItem("refreshToken", newRefresh);
+
+    return newAccess;
+  } catch {
+    return null;
+  }
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error: any) => {
     const originalRequest = error?.config;
 
-    // If no response or no status, forward error
     if (!error || !error.response) {
       return Promise.reject(error);
     }
 
     const status = error.response.status;
-
-    // Don't try to refresh for token endpoints or if _retry flag set
     const isTokenEndpoint =
-      originalRequest?.url?.includes("/auth/token/") || originalRequest?.url?.includes("/auth/token/refresh/");
+      originalRequest?.url?.includes("/auth/token/") ||
+      originalRequest?.url?.includes("/auth/token/refresh/");
 
-    // --- inside your api.ts interceptor --- //
-if (status === 401 && originalRequest && !originalRequest._retry && !isTokenEndpoint) {
-  (originalRequest as any)._retry = true;
+    if (status === 401 && originalRequest && !originalRequest._retry && !isTokenEndpoint) {
+      (originalRequest as any)._retry = true;
 
-  const refreshToken = localStorage.getItem("refreshToken");
-  if (!refreshToken) {
-    // No refresh -> force logout / redirect
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    if (typeof window !== "undefined") {
-      window.location.href = "/auth/login";
-    }
-    return Promise.reject(error);
-  }
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+        return Promise.reject(error);
+      }
 
-  if (isRefreshing) {
-    // queue this request until refresh finishes
-    return new Promise((resolve, reject) => {
-      subscribeTokenRefresh((token: string) => {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token: string) => {
+            if (!originalRequest.headers) originalRequest.headers = {};
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const newAccess = await refreshAccessToken();
+        if (!newAccess) throw new Error("Failed to refresh token");
+
+        onRefreshed(newAccess);
+
         if (!originalRequest.headers) originalRequest.headers = {};
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        resolve(api(originalRequest));
-      });
-    });
-  }
-
-  isRefreshing = true;
-
-  try {
-    // Explicitly type refresh response
-    interface RefreshResponse {
-      access: string;
-      refresh?: string;
+        originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
-
-    // Use axios directly (bypassing interceptors)
-    const resp = await axios.post<RefreshResponse>(`${API_BASE_URL}/auth/token/refresh/`, {
-      refresh: refreshToken,
-    });
-
-    const newAccess = resp.data.access; // TS now knows "access" exists
-
-    // Persist new access token
-    localStorage.setItem("accessToken", newAccess);
-
-    // Notify queued requests
-    onRefreshed(newAccess);
-
-    // Retry original request with new token
-    if (!originalRequest.headers) originalRequest.headers = {};
-    originalRequest.headers.Authorization = `Bearer ${newAccess}`;
-    return api(originalRequest);
-  } catch (refreshError) {
-    // Refresh failed -> clear storage and force redirect to login
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    if (typeof window !== "undefined") {
-      window.location.href = "/auth/login";
-    }
-    return Promise.reject(refreshError);
-  } finally {
-    isRefreshing = false;
-  }
-}
 
     return Promise.reject(error);
   }
@@ -469,8 +468,11 @@ export const createEquipment = async (equipment: Equipment): Promise<Equipment> 
 };
 
 // Update equipment
-export const updateEquipment = async (id: string, equipment: Equipment): Promise<Equipment> => {
-  const res = await api.put(`/equipment/${id}/`, equipment);
+export const updateEquipment = async (equipment: Equipment): Promise<Equipment> => {
+  if (!equipment.id) {
+    throw new Error("Equipment ID is required for update");
+  }
+  const res = await api.put(`/equipment/${equipment.id}/`, equipment);
   return res.data as Equipment;
 };
 
@@ -479,6 +481,15 @@ export const deleteEquipment = async (id: string): Promise<{ message: string }> 
   const res = await api.delete(`/equipment/${id}/`);
   return res.data as { message: string };
 };
+
+// Fetch single equipment
+export const fetchEquipmentById = async (id: string): Promise<Equipment> => {
+  const res = await api.get(`/equipment/${id}/`);
+  return res.data as Equipment;
+};
+
+
+
 
 
 // lib/api.ts (Documents CRUD additions)
