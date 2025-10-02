@@ -1,4 +1,4 @@
-#!/mnt/c/Users/DENNIS/construction-management-app/.venv/bin/python3
+#!/home/dennis/projects/construction-management-app/.venv/bin/python3
 import sys
 from celery.__main__ import main
 if __name__ == '__main__':
