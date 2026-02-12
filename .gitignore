@@ -1,3 +1,4 @@
+
 # Dependencies (Node)
 /node_modules
 /.pnp
@@ -11,9 +12,9 @@
 # Dependencies (Python)
 # Virtual environments should not be committed.
 # Recreate them from requirements.txt.
-/.venv
 /venv
 /env
+backend/.venv/
 
 # Testing
 /coverage
@@ -57,7 +58,12 @@ docker-compose.override.yml
 # IDE
 .vscode/
 .idea/
+.idx/
 
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase Functions
+functions/lib/
+functions/node_modules/

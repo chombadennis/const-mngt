@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // --- Axios Instance --- //
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -148,7 +148,7 @@ export const loginUser = async (
     refresh: string;
   }
 
-  const res = await api.post<SimpleJWTResponse>("/auth/token/", {
+  const res = await api.post<SimpleJWTResponse>("auth/token/", {
     username: data.username,
     password: data.password,
   });
