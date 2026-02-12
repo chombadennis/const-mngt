@@ -1,4 +1,4 @@
-#!/home/dennis/projects/construction-management-app/.venv/bin/python3
+#!/home/user/const-mngt/.venv/bin/python
 
 import sys
 import json
