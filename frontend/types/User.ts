@@ -4,4 +4,5 @@ export interface User {
   full_name: string;
   username: string;
   roles: string[];
+  is_superuser: boolean;
 }
